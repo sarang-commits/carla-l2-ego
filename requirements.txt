@@ -1,0 +1,6 @@
+# CARLA client — installed from the wheel bundled with the simulator:
+#   C:\Users\kksre\Downloads\CARLA_Latest\PythonAPI\carla\dist\carla-0.9.16-cp312-cp312-win_amd64.whl
+# The version pin below matches that wheel.
+carla==0.9.16
+numpy==2.5.1
+pygame==2.6.1
