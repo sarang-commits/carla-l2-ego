@@ -1,3 +1,109 @@
+# CARLA Engineering - Level 2 Simulation Demo
+
+**Project status: 11 September 2026.** The complete local engineering worktree
+has a live CARLA camera lane-keeping demo with longitudinal control, a
+stationary red obstacle/AEB demonstration, and a separate live backend readout.
+
+> **Publication status:** This GitHub main branch currently contains an older
+> 16-file snapshot with modules flattened into the root. It does not yet contain
+> the current demo launcher or complete package structure. This README update
+> documents the current local stage; full source publication is still pending.
+> The commands below require the complete local project.
+
+## Run the complete local project
+
+From the complete project directory, on an interactive Windows desktop:
+
+**Red obstacle car plus live backend readout (default obstacle: 80 m):**
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\scripts\run_demo_with_internals.ps1"
+```
+
+**Plain lane keeping plus live backend readout, with no obstacle:**
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\scripts\run_demo_with_internals.ps1" -ObstacleDistance 0
+```
+
+Or double-click `RUN_DEMO_WITH_INTERNALS.cmd` in the complete local project.
+Target speed remains **1.9 m/s**, with a **2.0 m/s** cap. Zero obstacle distance
+intentionally spawns no red car.
+
+Requirements: CARLA 0.9.16 server build `067529e82`, the matching Python client,
+Python 3.12, NumPy, pygame, and a real interactive Windows desktop. Allow about
+20 seconds for startup and 12 seconds for camera warmup. Keep CPU headroom for
+the existing 0.25 second perception freshness window.
+
+With the demo window focused, W/A/S/D or arrows trigger human override; ESC
+requests a controlled stop. Press Enter in a completed backend readout to close
+it. Each readout preserves its own run's final summary.
+
+## Preserved local validation
+
+Local launcher/readout fix: `c41229cf9190926a9d14e15fd992b55035656b7f`
+(not yet published here).
+
+Real CARLA runs executed on 10 September 2026:
+
+| Run | Clean | Peak autonomy (s) | AEB triggers | Stop gap (m) |
+| --- | --- | ---: | ---: | ---: |
+| Cold default | True | 37.15 | 1 | 1.935377 |
+| Back-to-back default 1 | True | 39.35 | 1 | 1.822996 |
+| Back-to-back default 2 | True | 38.35 | 1 | 1.941890 |
+| No obstacle | True | 65.00 | 0 | n/a |
+
+The preserved records show no errors, no remaining owned actors, restored
+world settings, and no collisions or lane invasions. Cold/default preceded the
+final listener-ownership check and readout footer polish; the back-to-back pair
+and final no-obstacle run exercised the final behavior.
+
+The user's original historical startup failure was not reproduced, so its
+exact root cause remains unresolved. The existing launchers were improved to
+own their server, wait a bounded time for port 2010, check cleanup, retain
+startup-error transcripts, and detect launcher exit in the readout.
+
+Local evidence: `logs/launcher_fix/VALIDATION_REPORT.md` and
+`logs/launcher_fix/verified_results.json`. These logs are not published here.
+This documentation/folder-renaming task did not change implementation or rerun
+CARLA. These bounded demo results do not replace separate historical mission
+acceptance decisions.
+
+## Architecture and scope
+
+Camera lane data supplies lateral steering through perception, temporal
+tracking, safety supervision, lateral control, the command envelope, and the
+actuator bridge. Map geometry supports scene selection and ground-truth
+evaluation. AEB obstacle range in this demo is ground-truth actor geometry,
+not camera object detection.
+
+This is a supervised simulator demonstration, not a road-vehicle deployment.
+
+## Source publication plan
+
+The current local worktree contains **106 tracked files**. Publish its complete
+directory structure, including `control/`, `perception/`, `safety/`,
+`scenario/`, `scripts/`, `sensors/`, `telemetry/`, and `tests/`.
+
+Keep every package's `__init__.py` in that package. Root-level flattened files
+such as `__init__1.py` do not substitute for this structure. Review the existing
+remote LICENSE, .gitattributes, and workflow before a future source sync.
+
+Use a separate reviewed publication branch. Git pushes commits and branches;
+a numbered file checklist is a preparation/review order, not sequential
+file-by-file publication. Keep logs, caches, virtual environments, and simulator
+binaries out of the source commit. No full source push or local-main merge was
+performed for this README update.
+
+## Historical published record
+
+The previous README is preserved below. Its mission statuses and feature
+limitations describe the older published snapshot, not the current complete
+local demo. Historical unresolved findings remain historical findings.
+
+<details>
+<summary>Expand the previous published mission record</summary>
+
 # carla-l2-exhibition
 
 Development project for CARLA 0.9.16 on Windows. Current scope: environment
@@ -2080,3 +2186,5 @@ control, target-speed control, actuator command, command-safety envelope,
 autopilot, scenario runner, fault injection, dashboard, or startup
 orchestration in Mission 9. A lateral *request* exists; a vehicle *command* does
 not. Missions 10-19 remain unimplemented.
+
+</details>
